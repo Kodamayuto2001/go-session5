@@ -37,5 +37,25 @@
 				base64.URLEncoding.EncodeToString(b)
 
 		クライアント情報とセッション情報の関連付け
+			クライアントから送信されるCookie情報からセッションIDを抽出する
+			サーバーに保存されているセッション情報のうちクッキーから抽出したセッションIDがkeyのものを取得できるかどうか検証する
+				
 		セッションの生成・保存・破棄
+			セッションを生成、保存、破棄する
 */
+
+package sessions
+
+import (
+	_ "crypto/rand"
+	_ "encoding/base64"
+	_ "errors"
+	_ "io"
+	_ "net/http"
+)
+
+type Manager struct {
+	//	小文字の場合は、外部パッケージからのアクセスができない
+	//	大文字の場合は、外部パッケージからアクセスができる
+	Database map[string]interface{}
+}

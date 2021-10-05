@@ -10,7 +10,9 @@ func main() {
 	var x sessions.Manager
 	
 	//	初期化が必要（初期化しないとエラーが出る）
-	x.Database = map[string]interface{}{}
-	x.Database["hoge"] = "hoge"
+	// x.Database = map[string]interface{}{}
+	x.Database = map[string]interface{}{
+		"hoge":"hoge",
+	}
 	fmt.Println(x)
 }

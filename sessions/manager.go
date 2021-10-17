@@ -47,15 +47,36 @@
 package sessions
 
 import (
-	_ "crypto/rand"
-	_ "encoding/base64"
+	"crypto/rand"
+	"encoding/base64"
 	_ "errors"
-	_ "io"
+	"io"
 	_ "net/http"
 )
 
 type Manager struct {
 	//	小文字の場合は、外部パッケージからのアクセスができない
 	//	大文字の場合は、外部パッケージからアクセスができる
-	Database map[string]interface{}
+	// Database map[string]interface{}
+	database map[string]interface{}
 }
+
+var mg Manager
+
+func NewManager() * Manager {
+	return &mg
+}
+
+//	セッションIDの発行
+func (m *Manager) NewSessionID() string {
+	b := make([]byte, 64)
+	if _, err := io.ReadFull(rand.Reader, b); err != nil {
+		return ""
+	}
+	return base64.URLEncoding.EncodeToString(b)
+}
+
+//	新規セッションの生成
+// func (m *Manager) New(r *http.Request, cookieName string) (*Session, error) {
+// 	cookie, err := r.Cookie(cookieName)
+// }

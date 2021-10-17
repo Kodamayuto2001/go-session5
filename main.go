@@ -11,8 +11,11 @@ func main() {
 	
 	//	初期化が必要（初期化しないとエラーが出る）
 	// x.Database = map[string]interface{}{}
-	x.Database = map[string]interface{}{
-		"hoge":"hoge",
-	}
-	fmt.Println(x)
+	// x.Database = map[string]interface{}{
+	// 	"hoge":"hoge",
+	// }
+	// fmt.Println(x)
+
+	fmt.Println(sessions.NewManager())
+	fmt.Println(x.NewSessionID())
 }

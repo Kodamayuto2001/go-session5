@@ -77,6 +77,46 @@ func (m *Manager) NewSessionID() string {
 }
 
 //	新規セッションの生成
-// func (m *Manager) New(r *http.Request, cookieName string) (*Session, error) {
-// 	cookie, err := r.Cookie(cookieName)
-// }
+func (m *Manager) New(r *http.Request, cookieName string) (*Session, error) {
+	//	Go言語で簡単にCookie操作ができる
+	//	Cookieの属性
+	//	Domain
+	//	Path
+	//	Expires
+	//	Secure
+	//	HttpOnlyなど
+	cookie, err := r.Cookie(cookieName)
+	//	cookie.Valueでcookieを取得する。
+	if err == nil && m.Exists(cookie.Value) {
+		return nil, errors.New("sessionIDはすでに発行されています")
+	}
+
+	//	session.goファイルの中のNewSession関数を使用する。
+	session := NewSession(m, cookieName)
+	//	IDは大文字から始まっているので、外部パッケージからでもアクセスできる
+	session.ID = m.NewSessionID()
+	//	requestは小文字なので、外部パッケージからアクセスできない
+	session.request = r 
+	
+	return session, nil 
+}
+
+//	既存セッションの存在チェック
+func (m *Manager) Exists(sessionID string) bool {
+	_, r := m.database[sessionID]
+	return r
+}
+
+//	セッション情報の保存
+func (m *Manager) Save(r *http.Request, w http.ResponseWriter, session *Session) error {
+	m.database[session.ID] = session 
+
+	c := &http.Cookie {
+		//	HTTPレスポンスヘッダのSetCookieフィールドを記述
+		//	Name:	cookieの名前を記述
+		//	Value:	cookieの値を記述
+		Name:	session.Name(),
+		Value:	session.ID,
+		Path:	"/",
+	}
+}

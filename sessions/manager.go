@@ -111,6 +111,7 @@ func (m *Manager) Exists(sessionID string) bool {
 func (m *Manager) Save(r *http.Request, w http.ResponseWriter, session *Session) error {
 	m.database[session.ID] = session 
 
+	//	Set-Cookie header field
 	c := &http.Cookie {
 		//	HTTPレスポンスヘッダのSetCookieフィールドを記述
 		//	Name:	cookieの名前を記述
@@ -119,4 +120,47 @@ func (m *Manager) Save(r *http.Request, w http.ResponseWriter, session *Session)
 		Value:	session.ID,
 		Path:	"/",
 	}
+
+	//	サーバー側からUser AgentにSet-Cookieヘッダフィールドを設定したものを送る。
+	http.SetCookie(session.writer, c)
+
+	return session, nil 
+}
+
+//	既存セッションの取得
+func (m *Manager) Get(r *http.Request, cookieName string) (*Session, error) {
+	//	User Agentから送られてきたCookie header fieldを取得する。
+	cookie, err := r.Cookie(cookieName)
+	if err != nil {
+		//	リクエストからcookie情報を取得できない場合
+		return nil ,err 
+	}
+
+	sessionID := cookie.Value
+	//	cookie情報からセッション情報を取得
+	//	mapの戻り値は、(value,bool)
+	//	v, ok := m["apple"]
+	//	appleが存在するとき、v = 値、ok = true
+	//	appleが存在しないとき v = 0、ok = false
+	buffer, exists := m.database[sessionID]
+	if !exists {
+		return nil, errors.New("無効なセッションIDです")
+	}
+
+	//	bufferという変数はinterface型
+	//	interface.(type)
+	//	interface型を「*Session」型にしている。
+	session := buffer.(*Session)
+	//	interface.(*Session)にしたので、Session構造体の変数を使うことができる
+	session.request = r 
+	return session, nil 
+}
+
+//	セッションの破棄
+func (m *Manager) Destroy(sessionID string) {
+	//	delete関数でkeyのvalueを消す。
+	//	key:	sessionID
+	//	map:	m.database
+	//	delete(map,key)
+	delete(m.database, sessionID)
 }

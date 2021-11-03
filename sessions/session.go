@@ -58,6 +58,10 @@ func StartSession(sessionName, cookieName string, manager *Manager) gin.HandlerF
 				ctx.Abort()
 			}
 		}
+		session.writer = ctx.Writer 
+		ctx.Set(sessionName, session)
+		defer context.Clear(ctx.Request)
+		ctx.Next()
 	}
 }
 

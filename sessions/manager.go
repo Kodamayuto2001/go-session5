@@ -49,9 +49,9 @@ package sessions
 import (
 	"crypto/rand"
 	"encoding/base64"
-	_ "errors"
+	"errors"
 	"io"
-	_ "net/http"
+	"net/http"
 )
 
 type Manager struct {
@@ -124,7 +124,7 @@ func (m *Manager) Save(r *http.Request, w http.ResponseWriter, session *Session)
 	//	サーバー側からUser AgentにSet-Cookieヘッダフィールドを設定したものを送る。
 	http.SetCookie(session.writer, c)
 
-	return session, nil 
+	return nil 
 }
 
 //	既存セッションの取得
